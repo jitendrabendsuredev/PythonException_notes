@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python Exception Handling</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#0f1b2d;--mute:#4d5b75;--line:#cfd8e6;--try:#1d4ed8;--exc:#c81e1e;--els:#15803d;--fin:#6d28d9;--rai:#b45309;--hl:#fde68a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--card:#131c30;--ink:#eef2fb;--mute:#a3b3cf;--line:#28344f;--try:#60a5fa;--exc:#f87171;--els:#4ade80;--fin:#a78bfa;--rai:#fbbf24;--hl:#4a4311}}
+:root[data-theme="dark"]{--bg:#0b1220;--card:#131c30;--ink:#eef2fb;--mute:#a3b3cf;--line:#28344f;--try:#60a5fa;--exc:#f87171;--els:#4ade80;--fin:#a78bfa;--rai:#fbbf24;--hl:#4a4311}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,sans-serif;font-size:clamp(17px,1.55vw,28px);line-height:1.45;display:flex;flex-direction:column}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+#bar{height:6px;background:var(--line);flex:none}
+#bar i{display:block;height:100%;width:0;background:var(--try);transition:width .3s}
+main{flex:1;overflow-y:auto;padding:1.2rem 5vw}
+.slide{max-width:1500px;margin:0 auto;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}*{transition:none!important}}
+h1{font-size:2.6rem;line-height:1.1;margin:.2em 0}
+h2{font-size:2rem;margin:.1em 0 .3em}
+p{margin:.3em 0 .8em;max-width:70ch}
+.lead{color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:1rem;align-items:start}
+pre{margin:0;font-family:"JetBrains Mono",Consolas,monospace;font-weight:500;font-size:.95rem;line-height:1.55;overflow-x:auto}
+.code{background:#0b1424;color:#e6edf9;border-radius:10px;padding:.8rem 1rem}
+.code .k-try{color:#60a5fa;font-weight:700}.code .k-except{color:#f87171;font-weight:700}.code .k-else{color:#4ade80;font-weight:700}.code .k-finally{color:#a78bfa;font-weight:700}.code .k-raise{color:#fbbf24;font-weight:700}
+.out{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:.7rem 1rem}
+.out b{display:block;color:var(--mute);font-size:.8rem;font-weight:700}
+.out .in{color:var(--rai);font-family:"JetBrains Mono",monospace;font-size:.85rem;margin-top:.3rem}
+.out.bad{border-color:var(--exc)}.out.bad pre{color:var(--exc)}
+.out.good{border-color:var(--els)}
+.tip{border-left:6px solid var(--rai);background:var(--card);padding:.5rem 1rem;margin-top:1rem;border-radius:0 8px 8px 0}
+.tag{display:inline-block;padding:.05rem .6rem;border-radius:6px;color:#fff;font-weight:700;font-family:"JetBrains Mono",monospace;font-size:.9em}
+.t-try{background:var(--try)}.t-except{background:var(--exc)}.t-else{background:var(--els)}.t-finally{background:var(--fin)}.t-raise{background:var(--rai)}
+.dark-fix{color:#fff}
+table{border-collapse:collapse;width:100%;background:var(--card)}
+th,td{border:1px solid var(--line);padding:.35rem .8rem;text-align:left}
+td code{font-family:"JetBrains Mono",monospace;font-size:.85em}
+th{background:var(--line)}
+.ctrl{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin:.5rem 0}
+.ctrl input{font:inherit;width:6em;padding:.3rem .6rem;border:2px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+button{font:inherit;cursor:pointer;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:.3rem .9rem}
+button:hover{border-color:var(--try)}button:focus-visible,input:focus-visible{outline:3px solid var(--try);outline-offset:2px}
+button.go{background:var(--try);border-color:var(--try);color:#fff;font-weight:700}
+#flow .ln{padding:0 .4rem;border-left:5px solid transparent;white-space:pre}
+#flow .g-t{border-left-color:#60a5fa}#flow .g-e{border-left-color:#f87171}#flow .g-s{border-left-color:#4ade80}#flow .g-f{border-left-color:#a78bfa}
+#flow .on{background:#3d3a10;outline:2px solid #fbbf24;border-radius:4px}
+#note{min-height:1.6em;color:var(--exc);font-weight:700;margin-top:.4rem}
+footer{flex:none;display:flex;align-items:center;gap:.8rem;padding:.6rem 5vw;border-top:2px solid var(--line);background:var(--card)}
+footer span{flex:1;text-align:center;color:var(--mute)}
+ol li{margin:.3rem 0}
+.qt{font-size:1.2em;margin:.3rem 0 .8rem}.qt pre{margin-top:.5rem}.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:.7rem}.opt{text-align:left;padding:.6rem 1rem}.opt b{color:var(--try);margin-right:.5rem}.opt.good{border-color:var(--els);background:var(--els);color:#fff}.opt.bad{border-color:var(--exc);background:var(--exc);color:#fff}.opt.good b,.opt.bad b{color:#fff}#qf .go{margin-top:.6rem}
+h3{font-size:1.5rem;margin:.3em 0}.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 .6rem}.chip{min-width:2.4em;padding:.1rem .6rem}.chip.on{background:var(--try);border-color:var(--try);color:#fff;font-weight:700}#sol{margin-top:.8rem}#sol[hidden]{display:none}
+</style>
+</head>
+<body>
+<div id="bar"><i></i></div>
+<main>
+
+<section class="slide">
+<h1>Exception Handling in Python</h1>
+<p class="lead">Keep your program running when something goes wrong.</p>
+<div class="grid">
+<div><p><b>Without handling</b></p>
+<pre class="code">print(10 / 0)
+print("Next line")</pre>
+<div class="out bad"><b>Output</b><pre>ZeroDivisionError: division by zero</pre></div>
+<p>The program stops. "Next line" never runs.</p></div>
+<div><p><b>With try and except</b></p>
+<pre class="code">try:
+    print(10 / 0)
+except:
+    print("Cannot divide by zero")
+print("Next line")</pre>
+<div class="out good"><b>Output</b><pre>Cannot divide by zero
+Next line</pre></div>
+<p>The program survives and continues.</p></div>
+</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Error or exception?</h2>
+<div class="grid">
+<div><p><span class="tag t-except">Syntax error</span> Python finds it <b>before</b> running. Nothing runs at all.</p>
+<pre class="code">print("Hello"</pre>
+<div class="out bad"><b>Output</b><pre>SyntaxError: '(' was never closed</pre></div></div>
+<div><p><span class="tag t-try">Exception</span> The code is correct, but it fails <b>while running</b>.</p>
+<pre class="code">num = int("abc")</pre>
+<div class="out bad"><b>Output</b><pre>ValueError: invalid literal for
+int() with base 10: 'abc'</pre></div></div>
+</div>
+<div class="tip">Exception handling is only for exceptions. We fix syntax errors by correcting the code.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Why do we need it?</h2>
+<p>An ATM does not break when you type a wrong PIN. It shows a message and lets you try again. Our programs should do the same.</p>
+<div class="grid">
+<div><pre class="code">age = int(input("Enter age: "))
+print("Next year:", age + 1)
+print("Thank you")</pre></div>
+<div class="out bad"><b>Output</b><div class="in">Input: abc</div><pre>ValueError: invalid literal for
+int() with base 10: 'abc'</pre></div>
+</div>
+<div class="tip">Line 2 and line 3 never run. One wrong input crashes the whole program.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Common exceptions</h2>
+<table>
+<tr><th>Exception</th><th>Example that causes it</th><th>Why</th></tr>
+<tr><td><code>ZeroDivisionError</code></td><td><code>10 / 0</code></td><td>Divide by zero</td></tr>
+<tr><td><code>ValueError</code></td><td><code>int("abc")</code></td><td>Right type, wrong value</td></tr>
+<tr><td><code>TypeError</code></td><td><code>"5" + 5</code></td><td>Mixing str and int</td></tr>
+<tr><td><code>IndexError</code></td><td><code>[1, 2, 3][5]</code></td><td>Index out of range</td></tr>
+<tr><td><code>KeyError</code></td><td><code>{"a": 1}["b"]</code></td><td>Key not in dictionary</td></tr>
+<tr><td><code>NameError</code></td><td><code>print(x)</code></td><td>Variable not defined</td></tr>
+<tr><td><code>FileNotFoundError</code></td><td><code>open("nofile.txt")</code></td><td>File does not exist</td></tr>
+</table>
+</section>
+
+<section class="slide" hidden>
+<h2><span class="tag t-try">try</span> and <span class="tag t-except">except</span></h2>
+<p>Put risky code in <b>try</b>. If an exception happens, Python jumps to <b>except</b>.</p>
+<div class="grid">
+<pre class="code">try:
+    age = int(input("Enter age: "))
+    print("Next year:", age + 1)
+except:
+    print("Please enter a number")
+print("Program continues")</pre>
+<div>
+<div class="out bad"><b>Output</b><div class="in">Input: abc</div><pre>Please enter a number
+Program continues</pre></div>
+<div class="out good" style="margin-top:.6rem"><b>Output</b><div class="in">Input: 20</div><pre>Next year: 21
+Program continues</pre></div>
+</div></div>
+<div class="tip">If try has no exception, the except block is skipped.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Catch specific exceptions</h2>
+<p>Use one <b>except</b> for each kind of problem. Each one gives its own message.</p>
+<div class="grid">
+<pre class="code">try:
+    a = int(input("Enter a: "))
+    b = int(input("Enter b: "))
+    print("Result:", a / b)
+except ValueError:
+    print("Enter whole numbers only")
+except ZeroDivisionError:
+    print("b cannot be zero")</pre>
+<div>
+<div class="out bad"><b>Output</b><div class="in">Input: 10 and 0</div><pre>b cannot be zero</pre></div>
+<div class="out bad" style="margin-top:.6rem"><b>Output</b><div class="in">Input: ten</div><pre>Enter whole numbers only</pre></div>
+</div></div>
+<div class="tip">A bare <b>except:</b> hides which error happened. Prefer a named exception.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Read the message with <span class="tag t-except">as e</span></h2>
+<p>Python gives every exception a message. Store it in a variable and print it.</p>
+<div class="grid">
+<pre class="code">marks = [70, 80, 90]
+try:
+    print(marks[5])
+except IndexError as e:
+    print("Error:", e)</pre>
+<div class="out bad"><b>Output</b><pre>Error: list index out of range</pre></div>
+</div>
+<pre class="code" style="margin-top:1rem">try:
+    price = {"pen": 10}["book"]
+except KeyError as e:
+    print("Missing key:", e)</pre>
+<div class="out bad" style="margin-top:.6rem"><b>Output</b><pre>Missing key: 'book'</pre></div>
+</section>
+
+<section class="slide" hidden>
+<h2><span class="tag t-else">else</span> runs when nothing went wrong</h2>
+<div class="grid">
+<pre class="code">try:
+    n = int(input("Enter number: "))
+except ValueError:
+    print("Not a number")
+else:
+    print("Square is", n * n)</pre>
+<div>
+<div class="out good"><b>Output</b><div class="in">Input: 4</div><pre>Square is 16</pre></div>
+<div class="out bad" style="margin-top:.6rem"><b>Output</b><div class="in">Input: abc</div><pre>Not a number</pre></div>
+</div></div>
+<div class="tip">Rule: <b>else</b> runs only if try finished with no exception.</div>
+</section>
+
+<section class="slide" hidden>
+<h2><span class="tag t-finally">finally</span> always runs</h2>
+<p>Use it for cleanup work, like closing a file, that must happen in every case.</p>
+<div class="grid">
+<pre class="code">try:
+    f = open("data.txt")
+    print(f.read())
+except FileNotFoundError:
+    print("File not found")
+finally:
+    print("Done")</pre>
+<div class="out bad"><b>Output</b><div class="in">data.txt does not exist</div><pre>File not found
+Done</pre></div>
+</div>
+<div class="tip">With an error or without an error, <b>finally</b> runs both times.</div>
+</section>
+
+<section class="slide" hidden>
+<h2><span class="tag t-raise">raise</span> your own exception</h2>
+<p>Sometimes the input is a valid number but still wrong for our rule. We raise the error ourselves.</p>
+<div class="grid">
+<pre class="code">try:
+    age = int(input("Enter age: "))
+    if age < 18:
+        raise ValueError("Age must be 18 or more")
+    print("Welcome")
+except ValueError as e:
+    print("Error:", e)</pre>
+<div>
+<div class="out bad"><b>Output</b><div class="in">Input: 15</div><pre>Error: Age must be 18 or more</pre></div>
+<div class="out good" style="margin-top:.6rem"><b>Output</b><div class="in">Input: 25</div><pre>Welcome</pre></div>
+</div></div>
+</section>
+
+<section class="slide" hidden>
+<h2>Catch many exceptions in one line</h2>
+<p>If two exceptions need the same message, put them in a tuple (round brackets).</p>
+<div class="grid">
+<pre class="code">try:
+    n = int(input("Enter number: "))
+    print("Result:", 100 / n)
+except (ValueError, ZeroDivisionError):
+    print("Invalid input")</pre>
+<div>
+<div class="out bad"><b>Output</b><div class="in">Input: abc</div><pre>Invalid input</pre></div>
+<div class="out bad" style="margin-top:.6rem"><b>Output</b><div class="in">Input: 0</div><pre>Invalid input</pre></div>
+<div class="out good" style="margin-top:.6rem"><b>Output</b><div class="in">Input: 4</div><pre>Result: 25.0</pre></div>
+</div></div>
+<div class="tip"><b>except Exception as e</b> catches almost every error. Use it as the last choice and print e to see what happened.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Ask again until the input is valid</h2>
+<p>Put try inside a <b>while True</b> loop. The <b>break</b> runs only if int() worked.</p>
+<div class="grid">
+<pre class="code">while True:
+    try:
+        age = int(input("Enter age: "))
+        break
+    except ValueError:
+        print("Wrong input, try again")
+print("Age is", age)</pre>
+<div class="out good"><b>Output</b><div class="in">Input: abc, then 25</div><pre>Wrong input, try again
+Age is 25</pre></div>
+</div>
+<div class="tip">A wrong value skips break, so the loop asks again.</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Watch the flow</h2>
+<p>Enter two values and press Run. The highlighted line shows where Python is.</p>
+<div class="ctrl">a = <input id="ia" value="10" aria-label="value of a"> b = <input id="ib" value="2" aria-label="value of b">
+<button class="go" id="run">Run</button>
+<button data-a="10" data-b="2">10 and 2</button><button data-a="10" data-b="0">10 and 0</button><button data-a="ten" data-b="2">ten and 2</button></div>
+<div class="grid">
+<div><pre class="code" id="flow"></pre><div id="note"></div></div>
+<div class="out"><b>Output</b><pre id="res"></pre></div>
+</div>
+</section>
+
+<section class="slide" hidden>
+<h2>Summary and practice</h2>
+<div class="grid">
+<table>
+<tr><td><span class="tag t-try">try</span></td><td>Risky code goes here</td></tr>
+<tr><td><span class="tag t-except">except</span></td><td>Runs if an exception happens</td></tr>
+<tr><td><span class="tag t-else">else</span></td><td>Runs if no exception happens</td></tr>
+<tr><td><span class="tag t-finally">finally</span></td><td>Runs every time</td></tr>
+<tr><td><span class="tag t-raise">raise</span></td><td>Create an exception yourself</td></tr>
+</table>
+<div><p><b>Practice</b></p><ol>
+<li>Divide two numbers. Handle ValueError and ZeroDivisionError.</li>
+<li>Ask for an index of a list of 5 items. Handle IndexError.</li>
+<li>Ask a student name from a dictionary of marks. Handle KeyError.</li>
+<li>Ask age. Raise ValueError if it is negative.</li>
+<li>Open a missing file. Print "Done" in finally.</li>
+</ol></div></div>
+</section>
+
+<section class=slide hidden>
+<h2>Quiz: 50 MCQs</h2>
+<div id=qbox></div>
+</section>
+
+<section class=slide hidden>
+<h2>Coding practice: 15 problems</h2>
+<div id=cbox></div>
+</section>
+
+</main>
+<footer>
+<button id="prev">Previous</button><span id="count"></span><button id="theme" aria-label="Toggle theme">Light / Dark</button><button class="go" id="next">Next</button>
+</footer>
+<script>
+const hl=s=>s.replace(/\b(try|except|else|finally|raise)\b/g,'<span class="k-$1">$1</span>');
+document.querySelectorAll('pre.code:not(#flow)').forEach(p=>{p.innerHTML=hl(p.innerHTML)});
+const slides=[...document.querySelectorAll('.slide')];let cur=0;
+function show(n){cur=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>{s.hidden=k!==cur});
+document.getElementById('count').textContent=(cur+1)+' / '+slides.length;
+document.querySelector('#bar i').style.width=((cur+1)/slides.length*100)+'%';
+document.querySelector('main').scrollTop=0}
+document.getElementById('next').onclick=()=>show(cur+1);
+document.getElementById('prev').onclick=()=>show(cur-1);
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;
+if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(cur+1)}
+if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(cur-1)}});
+document.getElementById('theme').onclick=()=>{const r=document.documentElement;
+const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+r.dataset.theme=dark?'light':'dark'};
+const L=['try:','    a = int(A)','    b = int(B)','    result = a / b','except ValueError:','    print("Numbers only")','except ZeroDivisionError:','    print("Cannot divide by zero")','else:','    print("Result:", result)','finally:','    print("Done")'];
+const G=['t','t','t','t','e','e','e','e','s','s','f','f'];
+const flow=document.getElementById('flow');
+flow.innerHTML=L.map((t,i)=>'<div class="ln g-'+G[i]+'" data-i="'+i+'">'+hl(t)+'</div>').join('');
+const ok=s=>/^\s*[+-]?\d+\s*$/.test(s);let token=0;
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function run(){const my=++token;const A=document.getElementById('ia').value,B=document.getElementById('ib').value;
+const res=document.getElementById('res'),note=document.getElementById('note');res.textContent='';note.textContent='';
+let path=[0,1],msgs={},r='';
+if(!ok(A)){path.push(4,5,10,11);note.textContent='ValueError at line 2, so Python jumps to except ValueError'}
+else{path.push(2);
+if(!ok(B)){path.push(4,5,10,11);note.textContent='ValueError at line 3, so Python jumps to except ValueError'}
+else{path.push(3);const a=parseInt(A,10),b=parseInt(B,10);
+if(b===0){path.push(4,6,7,10,11);note.textContent='ZeroDivisionError at line 4. First except does not match, second one does'}
+else{const v=a/b;r=Number.isInteger(v)?v.toFixed(1):String(v);path.push(8,9,10,11);note.textContent='No exception, so else runs'}}}
+msgs={5:'Numbers only',7:'Cannot divide by zero',9:'Result: '+r,11:'Done'};
+for(const i of path){if(my!==token)return;
+flow.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));
+flow.querySelector('[data-i="'+i+'"]').classList.add('on');
+if(msgs[i]!==undefined)res.textContent+=(res.textContent?'\n':'')+msgs[i];
+await wait(matchMedia('(prefers-reduced-motion:reduce)').matches?200:750)}}
+document.getElementById('run').onclick=run;
+document.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{document.getElementById('ia').value=b.dataset.a;document.getElementById('ib').value=b.dataset.b;run()});
+const c=s=>`<pre class=code>${s.split('|').join('\n')}</pre>`;
+const Q=[
+[`What is an exception?`,[`A mistake Python finds before the program starts`,`An error that happens while the program is running`,`A comment in the code`,`A type of loop`],1,`An exception is raised at run time, even when the code is written correctly.`],
+[`Where do we write the risky code?`,[`except block`,`finally block`,`try block`,`else block`],2,`Code that may fail goes inside try.`],
+[`What is the output?${c('try:|    print(10 / 0)|except ZeroDivisionError:|    print(\'Zero\')')}`,[`Zero`,`0`,`ZeroDivisionError`,`Nothing`],0,`10 / 0 raises ZeroDivisionError, so the except block prints Zero.`],
+[`Which exception does <code>int('abc')</code> raise?`,[`TypeError`,`NameError`,`KeyError`,`ValueError`],3,`The type is right (str) but the value cannot become an integer.`],
+[`Which exception does <code>'5' + 5</code> raise?`,[`ValueError`,`IndexError`,`TypeError`,`SyntaxError`],2,`You cannot add a str and an int.`],
+[`Which exception does <code>[1, 2, 3][5]</code> raise?`,[`IndexError`,`KeyError`,`ValueError`,`NameError`],0,`The list has only 3 items, so index 5 is out of range.`],
+[`Which exception does <code>{'a': 1}['b']</code> raise?`,[`IndexError`,`TypeError`,`KeyError`,`NameError`],2,`Key b is not in the dictionary.`],
+[`Which exception happens when you print a variable that was never created?`,[`NameError`,`ValueError`,`TypeError`,`KeyError`],0,`Python does not know the name, so it raises NameError.`],
+[`Which exception does <code>open('nofile.txt')</code> raise when the file does not exist?`,[`NameError`,`ValueError`,`IndexError`,`FileNotFoundError`],3,`The file is missing, so Python raises FileNotFoundError.`],
+[`When does the else block run?`,[`When an exception happens`,`Every time`,`When try finishes with no exception`,`Never`],2,`else is the no-error block.`],
+[`When does the finally block run?`,[`Only when there is an exception`,`Only when there is no exception`,`Every time, with or without an exception`,`Only if else is present`],2,`finally is used for work that must happen in every case.`],
+[`Which error can try/except NOT handle in the same program?`,[`ZeroDivisionError`,`ValueError`,`SyntaxError`,`KeyError`],2,`A SyntaxError is found before the program runs, so try never gets a chance.`],
+[`Which keyword creates an exception on purpose?`,[`throw`,`raise`,`error`,`catch`],1,`Python uses raise. throw and catch belong to other languages.`],
+[`In <code>except ValueError as e</code>, what does e hold?`,[`The line number`,`The name of the file`,`The value True`,`The error message of the exception`],3,`e is the exception object. Printing it shows the message.`],
+[`What is the output?${c('try:|    print(\'A\')|except:|    print(\'B\')|else:|    print(\'C\')|finally:|    print(\'D\')')}`,[`A B D`,`A D`,`A C D`,`B D`],2,`No exception, so try prints A, else prints C, and finally prints D.`],
+[`What is the output?${c('try:|    int(\'x\')|except ValueError:|    print(\'1\')|except ZeroDivisionError:|    print(\'2\')')}`,[`1`,`2`,`1 and 2`,`Error`],0,`int('x') raises ValueError, so only the first except runs.`],
+[`No except block matches the exception. What happens?`,[`The program stops with an error`,`Python ignores it`,`The else block runs`,`The program runs normally`],0,`An unhandled exception stops the program.`],
+[`Can one try block have more than one except block?`,[`No, only one`,`Only two`,`Only with finally`,`Yes, one for each kind of exception`],3,`Use one except for each exception you want to handle.`],
+[`What does a bare <code>except:</code> catch?`,[`Only ValueError`,`Only syntax errors`,`Every exception`,`Nothing`],2,`It catches everything, which is why a named exception is better.`],
+[`What is the output?${c('try:|    print(10 / 2)|except:|    print(\'Error\')|else:|    print(\'OK\')')}`,[`5.0 then OK`,`5 then OK`,`Error`,`5.0 then Error`],0,`10 / 2 gives 5.0 in Python. No exception, so else prints OK.`],
+[`An exception happens on line 2 of a try block that has 4 lines. What happens to lines 3 and 4?`,[`They run normally`,`They are skipped`,`They run after except`,`They run in finally`],1,`Python jumps out of try at the error line, so the rest of try is skipped.`],
+[`What is the output?${c('try:|    n = int(\'12\')|    print(n + 1)|except ValueError:|    print(\'Bad\')')}`,[`Bad`,`12`,`Error`,`13`],3,`'12' converts to 12, so there is no exception and 13 is printed.`],
+[`What is the output?${c('try:|    raise ValueError(\'Bad age\')|except ValueError as e:|    print(e)')}`,[`ValueError`,`Bad age`,`e`,`Nothing`],1,`Printing e shows the message we gave to raise.`],
+[`What is the correct order of the blocks?`,[`try, finally, except, else`,`except, try, else, finally`,`try, except, else, finally`,`try, else, except, finally`],2,`Order: try, except, else, finally.`],
+[`Which is the better practice?`,[`Catch the specific exception, like ValueError`,`Use bare except everywhere`,`Never use try`,`Use finally instead of except`],0,`A named exception shows exactly which problem you are handling.`],
+[`Which exception does <code>int('3.5')</code> raise?`,[`TypeError`,`IndexError`,`ValueError`,`NameError`],2,`'3.5' is a str that looks like a float, so int() cannot convert it. Right type, wrong value.`],
+[`Which exception does <code>len(5)</code> raise?`,[`TypeError`,`ValueError`,`KeyError`,`IndexError`],0,`An int has no length. The object is the wrong type for len().`],
+[`Which exception does <code>[].pop()</code> raise?`,[`KeyError`,`ValueError`,`NameError`,`IndexError`],3,`You cannot pop from an empty list, so Python raises IndexError.`],
+[`Which exception does <code>import mathh</code> raise?`,[`ModuleNotFoundError`,`NameError`,`FileNotFoundError`,`SyntaxError`],0,`There is no module with this name. ModuleNotFoundError is a kind of ImportError.`],
+[`Which exception does <code>10 % 0</code> raise?`,[`ValueError`,`ZeroDivisionError`,`TypeError`,`NameError`],1,`The remainder operator also divides, so zero gives ZeroDivisionError.`],
+[`Which line catches both ValueError and TypeError in one except?`,[`except ValueError + TypeError:`,`except ValueError and TypeError:`,`except [ValueError, TypeError]:`,`except (ValueError, TypeError):`],3,`Put the exceptions inside a tuple, which means round brackets.`],
+[`What is the output?${c('try:|    print(1 / 0)|except ZeroDivisionError:|    print("E")|finally:|    print("F")')}`,[`E then F`,`F then E`,`E only`,`F only`],0,`except prints E, then finally prints F.`],
+[`What is the output?${c('try:|    print("A")|    int("x")|    print("B")|except ValueError:|    print("C")')}`,[`A B C`,`A C`,`A B`,`C`],1,`A prints, int('x') fails, B is skipped, and except prints C.`],
+[`What is the output?${c('try:|    x = 10 / 0|except ZeroDivisionError:|    print("X")|else:|    print("Y")')}`,[`Y`,`X and Y`,`X`,`Nothing`],2,`An exception happened, so else is skipped. Only X is printed.`],
+[`What is the output?${c('try:|    raise TypeError("Wrong type")|except TypeError as e:|    print("Caught:", e)')}`,[`Caught: Wrong type`,`Caught: TypeError`,`Wrong type`,`Error`],0,`e holds the message given to raise.`],
+[`Which class catches almost every common run-time error, such as ValueError and TypeError?`,[`Error`,`Exception`,`Catch`,`Run`],1,`Most built-in exceptions are children of Exception, so <code>except Exception</code> catches them.`],
+[`What is the output?${c('try:|    print(x)|except NameError:|    print("No x")')}`,[`None`,`0`,`No x`,`x`],2,`x was never created, so Python raises NameError and except prints No x.`],
+[`An exception is caught by except. What happens to the code after the whole try/except block?`,[`It is skipped`,`It runs normally`,`The program restarts`,`It runs only in finally`],1,`After a handled exception, the program carries on with the next line.`],
+[`Can we use try with finally and no except?`,[`No, except is compulsory`,`Only with else`,`Yes, it is allowed`,`Only with raise`],2,`try/finally is valid. finally runs, but an unhandled exception still stops the program afterwards.`],
+[`Which combination is NOT allowed?`,[`try + except`,`try + finally`,`try + except + else`,`try + else (no except)`],3,`else needs an except before it. Without except it is a SyntaxError.`],
+[`Which exception does <code>int(None)</code> raise?`,[`ValueError`,`TypeError`,`NameError`,`KeyError`],1,`None is not a string or a number, so the type itself is wrong.`],
+[`Which exception is raised?${c('d = {}|d["a"] += 1')}`,[`NameError`,`IndexError`,`ValueError`,`KeyError`],3,`The key a does not exist yet, so reading it gives KeyError.`],
+[`Which exception does <code>'abc'[10]</code> raise?`,[`IndexError`,`KeyError`,`ValueError`,`TypeError`],0,`The string has only 3 characters, so index 10 is out of range.`],
+[`Which exception is raised?${c('t = (1, 2)|t[0] = 5')}`,[`ValueError`,`KeyError`,`IndexError`,`TypeError`],3,`A tuple cannot be changed, so item assignment raises TypeError.`],
+[`What is the output?${c('try:|    print([1, 2][5])|except ValueError:|    print("V")|except IndexError:|    print("I")')}`,[`V`,`I`,`V and I`,`Error`],1,`Index 5 is out of range, so the IndexError block runs.`],
+[`What is the output?${c('try:|    raise KeyError("id")|except KeyError as e:|    print(e)')}`,[`id`,`KeyError`,`'id'`,`KeyError: id`],2,`A KeyError prints its message with quotes, so the output is 'id'.`],
+[`Why do we put <code>int(input())</code> inside try?`,[`To make it run faster`,`To stop the program from crashing when the user types text`,`To convert text to float`,`To avoid using else`],1,`If the user types text, int() raises ValueError. try/except handles it politely.`],
+[`What is the output?${c('try:|    print("Hi")|finally:|    print("Bye")')}`,[`Hi then Bye`,`Bye then Hi`,`Hi only`,`Bye only`],0,`try runs first, then finally always runs.`],
+[`Which is a good use of the finally block?`,[`Declaring a variable`,`Creating an exception`,`Closing a file or connection`,`Skipping the except block`],2,`Cleanup work must happen with or without an error, so it goes in finally.`],
+[`What is the output?${c('age = 20|try:|    if age &lt; 18:|        raise ValueError("Minor")|    print("Adult")|except ValueError as e:|    print(e)')}`,[`Minor`,`Adult`,`Minor then Adult`,`Error`],1,`20 is not below 18, so nothing is raised and Adult is printed.`]
+];
+let qi=0,score=0,answered=false;const qb=document.getElementById('qbox');
+function renderQ(){answered=false;
+if(qi>=Q.length){qb.innerHTML=`<h2>Your score: ${score} / ${Q.length}</h2><button class=go id=qr>Restart quiz</button>`;document.getElementById('qr').onclick=()=>{qi=0;score=0;renderQ()};return}
+const q=Q[qi];
+qb.innerHTML=`<p class=lead>Question ${qi+1} of ${Q.length} &nbsp; Score: ${score}</p><div class=qt>${q[0]}</div><div class=opts>${q[1].map((o,i)=>`<button class=opt data-i=${i}><b>${'ABCD'[i]}</b>${o}</button>`).join('')}</div><div id=qf></div>`;
+qb.querySelectorAll('pre.code').forEach(p=>{p.innerHTML=hl(p.innerHTML)});
+qb.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.i))}
+function answer(i){if(answered)return;answered=true;const q=Q[qi],ok=i===q[2];
+const bs=qb.querySelectorAll('.opt');bs[q[2]].classList.add('good');if(!ok)bs[i].classList.add('bad');if(ok)score++;
+document.getElementById('qf').innerHTML=`<div class=tip>${ok?'Correct. ':'Not quite. '}${q[3]}</div><button class=go id=qn>${qi+1<Q.length?'Next question':'See score'}</button>`;
+document.getElementById('qn').onclick=()=>{qi++;renderQ()}}
+document.addEventListener('keydown',e=>{if(cur!==slides.length-2||e.target.tagName==='INPUT')return;
+if('1234'.includes(e.key)&&e.key.length===1){const b=qb.querySelectorAll('.opt')[+e.key-1];if(b)b.click()}
+if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){const n=document.getElementById('qn')||document.getElementById('qr');if(n)n.click()}});
+const P=[
+[`Safe division`,`Read two whole numbers and print a / b. Show "Enter whole numbers only" for text and "b cannot be zero" for zero.`,
+`try:
+    a = int(input("Enter a: "))
+    b = int(input("Enter b: "))
+    print("Result:", a / b)
+except ValueError:
+    print("Enter whole numbers only")
+except ZeroDivisionError:
+    print("b cannot be zero")`,`Input: 10 and 0
+b cannot be zero`],
+[`Next year age`,`Read age and print age next year. If the user types text, print "Please enter a number". Print "Program ends" in every case.`,
+`try:
+    age = int(input("Enter age: "))
+    print("Next year:", age + 1)
+except ValueError:
+    print("Please enter a number")
+print("Program ends")`,`Input: abc
+Please enter a number
+Program ends`],
+[`List index`,`A list has 5 items. Ask for an index and print the item. Handle text input and an index that is too big.`,
+`items = ["pen", "book", "bag", "ruler", "eraser"]
+try:
+    i = int(input("Enter index: "))
+    print(items[i])
+except ValueError:
+    print("Index must be a number")
+except IndexError:
+    print("Index is out of range")`,`Input: 9
+Index is out of range`],
+[`Student marks`,`A dictionary stores marks of 3 students. Ask a name and print the marks. If the name is missing, print "Student not found".`,
+`marks = {"Amit": 80, "Sara": 92, "John": 67}
+name = input("Enter student name: ")
+try:
+    print(name, "scored", marks[name])
+except KeyError:
+    print("Student not found")`,`Input: Ravi
+Student not found`],
+[`Missing file`,`Open a file that does not exist. Print "File not found" if it is missing. Print "Done" in finally.`,
+`try:
+    f = open("missing.txt")
+    print(f.read())
+except FileNotFoundError:
+    print("File not found")
+finally:
+    print("Done")`,`File not found
+Done`],
+[`Negative age`,`Read age. If it is negative, raise ValueError with the message "Age cannot be negative" and print it using as e.`,
+`try:
+    age = int(input("Enter age: "))
+    if age < 0:
+        raise ValueError("Age cannot be negative")
+    print("Age is", age)
+except ValueError as e:
+    print("Error:", e)`,`Input: -5
+Error: Age cannot be negative`],
+[`Square with else`,`Read a number. Print its square in the else block. Print "Not a number" in except.`,
+`try:
+    n = int(input("Enter number: "))
+except ValueError:
+    print("Not a number")
+else:
+    print("Square is", n * n)`,`Input: 4
+Square is 16`],
+[`Show Python's message`,`Read a number. If it fails, print the message Python gives, using as e.`,
+`try:
+    n = int(input("Enter number: "))
+except ValueError as e:
+    print("Error:", e)
+else:
+    print("You entered", n)`,`Input: abc
+Error: invalid literal for int() with base 10: 'abc'`],
+[`Ask again`,`Keep asking for a number until the user enters a valid one. Then print it.`,
+`while True:
+    try:
+        n = int(input("Enter a number: "))
+        break
+    except ValueError:
+        print("Wrong input, try again")
+print("You entered", n)`,`Input: abc, then 7
+Wrong input, try again
+You entered 7`],
+[`Two errors, one message`,`Print 100 divided by a number. For text input or zero, print "Invalid input" using one except line.`,
+`x = input("Enter a number: ")
+try:
+    print("Result:", 100 / int(x))
+except (ValueError, ZeroDivisionError):
+    print("Invalid input")`,`Input: 0
+Invalid input`],
+[`Marks validation`,`Read marks. If they are below 0 or above 100, raise ValueError("Marks must be between 0 and 100"). Handle it with as e.`,
+`try:
+    marks = int(input("Enter marks (0-100): "))
+    if marks < 0 or marks > 100:
+        raise ValueError("Marks must be between 0 and 100")
+    print("Marks accepted:", marks)
+except ValueError as e:
+    print("Error:", e)`,`Input: 150
+Error: Marks must be between 0 and 100`],
+[`Average of marks`,`Find the average of a list of marks. Handle the case when the list is empty.`,
+`marks = []
+try:
+    avg = sum(marks) / len(marks)
+    print("Average:", avg)
+except ZeroDivisionError:
+    print("No marks to average")`,`No marks to average
+(Try marks = [70, 80, 90] and you get Average: 80.0)`],
+[`PIN with 3 attempts`,`The correct PIN is 1234. Allow 3 attempts. Text input counts as an attempt. After 3 wrong attempts print "Card blocked".`,
+`correct = 1234
+tries = 0
+while tries < 3:
+    try:
+        pin = int(input("Enter PIN: "))
+    except ValueError:
+        print("PIN must be digits only")
+    else:
+        if pin == correct:
+            print("Access granted")
+            break
+        print("Wrong PIN")
+    tries += 1
+if tries == 3:
+    print("Card blocked")`,`Inputs: 1111, abc, 2222
+Wrong PIN
+PIN must be digits only
+Wrong PIN
+Card blocked`],
+[`Always close the file`,`Open notes.txt and print it. Handle a missing file. In finally, close the file only if it was opened.`,
+`f = None
+try:
+    f = open("notes.txt")
+    print(f.read())
+except FileNotFoundError:
+    print("File not found")
+finally:
+    if f is not None:
+        f.close()
+        print("File closed")
+    print("Done")`,`notes.txt is missing:
+File not found
+Done`],
+[`ATM withdrawal`,`Balance is 5000. Read the amount. Raise ValueError for zero or negative, and for more than the balance. Print "Thank you" in finally.`,
+`balance = 5000
+try:
+    amount = int(input("Enter amount: "))
+    if amount <= 0:
+        raise ValueError("Amount must be positive")
+    if amount > balance:
+        raise ValueError("Insufficient balance")
+    balance -= amount
+    print("Collect cash. Balance:", balance)
+except ValueError as e:
+    print("Error:", e)
+finally:
+    print("Thank you")`,`Input: 8000
+Error: Insufficient balance
+Thank you`]
+];
+let pi=0;const cb=document.getElementById('cbox');
+function renderP(){const p=P[pi];
+cb.innerHTML=`<div class=chips>${P.map((_,i)=>`<button class="chip${i===pi?' on':''}" data-i=${i}>${i+1}</button>`).join('')}</div><h3>Problem ${pi+1}: ${p[0]}</h3><p>${p[1]}</p><button class=go id=ts>Show solution</button><div id=sol hidden><div class=grid><pre class=code id=sc></pre><div class="out good"><b>Sample output</b><pre id=so></pre></div></div></div><div class=ctrl><button id=pp>Previous problem</button><button id=pn>Next problem</button></div>`;
+const sc=document.getElementById('sc');sc.textContent=p[2];sc.innerHTML=hl(sc.innerHTML);document.getElementById('so').textContent=p[3];
+const ts=document.getElementById('ts'),sol=document.getElementById('sol');
+ts.onclick=()=>{sol.hidden=!sol.hidden;ts.textContent=sol.hidden?'Show solution':'Hide solution'};
+cb.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{pi=+b.dataset.i;renderP()});
+document.getElementById('pp').onclick=()=>{pi=Math.max(0,pi-1);renderP()};
+document.getElementById('pn').onclick=()=>{pi=Math.min(P.length-1,pi+1);renderP()}}
+renderP();
+renderQ();
+show(0);
+</script>
+</body>
+</html>
